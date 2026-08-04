@@ -1,0 +1,11 @@
+# Build output from verifying references/build.gradle
+build/
+.gradle/
+*.jar
+!creating-appian-plugins/references/*.jar
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
