@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.1.0 — 2026-08-27
+
+### Added
+
+- **Kiro steering file** at `.kiro/steering/creating-appian-plugins.md`. Uses `fileMatch` inclusion
+  so the guidance activates automatically when Kiro reads a `*.gradle` or `appian-plugin.xml` file
+  into context. References the same `creating-appian-plugins/` content via `#[[file:...]]` includes.
+- Kiro installation section in `README.md` with three options: work in this repo directly, copy
+  `.kiro/` to another project, or use inline `#[[file:...]]` references.
+- Steering inclusion mode reference table in `README.md` (always / fileMatch / manual).
+
+### Changed
+
+- `README.md` header updated from "Claude skill" to "AI skill" — the content is AI-agnostic and
+  now works with both Claude Code (as a skill) and Kiro (as a steering file).
+- Layout section in `README.md` now shows the `.kiro/steering/` directory.
+
 ## 1.0.0 — 2026-08-04
 
 Initial release of the `creating-appian-plugins` skill.

@@ -1,7 +1,8 @@
 # cs-utility-aiSkill-AppianPluginDevelopment
 
-Source repository for the **`creating-appian-plugins`** Claude skill — a reference for building
-Appian plug-ins from scratch, including their build environments.
+Source repository for the **`creating-appian-plugins`** AI skill — a reference for building
+Appian plug-ins from scratch, including their build environments. Works with both
+**Claude Code** (as a skill) and **Kiro** (as a steering file).
 
 The skill covers smart services, expression functions, connected systems and integrations, custom
 data types, servlets, and SAIL component plug-ins.
@@ -9,6 +10,9 @@ data types, servlets, and SAIL component plug-ins.
 ## Layout
 
 ```
+.kiro/
+  steering/
+    creating-appian-plugins.md    Kiro steering file (fileMatch on *.gradle / appian-plugin.xml)
 creating-appian-plugins/
   SKILL.md                        entry point: decision tree, traps, checklists
   references/
@@ -19,6 +23,8 @@ creating-appian-plugins/
 ```
 
 ## Installation
+
+### Claude Code (skill)
 
 `~/.claude/skills/creating-appian-plugins` is a **directory junction** pointing at
 `creating-appian-plugins/` in this repo. Edit here and the installed skill updates immediately —
@@ -44,6 +50,61 @@ To install as a plain copy instead (e.g. on another machine):
 ```powershell
 Copy-Item creating-appian-plugins ~\.claude\skills\ -Recurse
 ```
+
+### Kiro (steering file)
+
+Kiro uses **steering files** in `.kiro/steering/` to provide the same contextual guidance that
+Claude Code gets from skills. This repo ships a ready-made steering file at
+`.kiro/steering/creating-appian-plugins.md`.
+
+**Option A — Work directly in this repo.** The steering file is already in place. Open this
+project in Kiro and the guidance is active immediately.
+
+**Option B — Add to another project.** Copy the steering directory into your target workspace:
+
+```powershell
+Copy-Item .kiro -Destination <your-project-root>\ -Recurse
+```
+
+Or create a symlink so edits here propagate automatically:
+
+```powershell
+# From your target project root
+New-Item -ItemType Junction `
+  -Path   .kiro\steering `
+  -Target ~\Projects\cs-utility-aiSkill-AppianPluginDevelopment\.kiro\steering
+```
+
+**Option C — Reference files inline.** Kiro steering files support `#[[file:<path>]]` includes.
+If you prefer a minimal steering file that points at the full references rather than embedding
+them, create `.kiro/steering/creating-appian-plugins.md` in your project with:
+
+```markdown
+---
+inclusion: manual
+---
+# Creating Appian Plug-ins
+#[[file:creating-appian-plugins/SKILL.md]]
+#[[file:creating-appian-plugins/references/module-reference.md]]
+#[[file:creating-appian-plugins/references/java-patterns.md]]
+#[[file:creating-appian-plugins/references/component-plugins.md]]
+#[[file:creating-appian-plugins/references/build.gradle]]
+```
+
+The `inclusion: manual` front matter means the steering is available via the `#` context key in
+chat rather than being always loaded — useful if you don't need Appian plug-in guidance on every
+prompt.
+
+#### Steering inclusion modes
+
+| Mode | Front matter | Behaviour |
+|---|---|---|
+| Always (default) | *(none)* | Loaded into every Kiro prompt automatically |
+| File match | `inclusion: fileMatch` + `fileMatchPattern: '*.gradle'` | Loaded when a matching file is read into context |
+| Manual | `inclusion: manual` | Available via `#` in chat — the user opts in per prompt |
+
+The shipped `.kiro/steering/creating-appian-plugins.md` uses `manual` inclusion so it's available
+via `#` in chat but doesn't load on every prompt — pull it in when you're working on plug-in code.
 
 ## How this skill was built, and how to extend it
 
