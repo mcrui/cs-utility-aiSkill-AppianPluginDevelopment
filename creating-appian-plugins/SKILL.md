@@ -107,6 +107,7 @@ references a class it does not ship. Harmless, unavoidable, not a broken depende
 
 | Module | Element | Java contract |
 |---|---|---|
+| Function category | `<function-category key= name=>` + `<i18n-bundle>` | referenced by `@Category("key")` on the function class |
 | Expression function | `<function key= class=/>` | `@Function` method; class annotated with a category annotation |
 | Smart service | `<smart-service name= key= class=/>` | extends `AppianSmartService` |
 | Dropdown values | `<enumeration key= type=>` + `<items>` | referenced by `@Input(enumeration="key")` |
@@ -116,7 +117,7 @@ references a class it does not ship. Harmless, unavoidable, not a broken depende
 
 Full attribute detail, i18n rules and working code: `references/module-reference.md`, `references/java-patterns.md`.
 
-There is **no `<function-category>` element.** Function categories come from Java annotations (`@Category`, `@AppianScriptingFunctionsCategory`).
+Function categories can come from **either** a `<function-category>` element in the descriptor **or** Java annotations (`@Category`, `@AppianScriptingFunctionsCategory`). The descriptor element accepts an `<i18n-bundle>` child for the category label; the annotation approach requires no XML. Both are valid — use the descriptor when you want explicit i18n control, use annotations for simplicity. See `references/module-reference.md` for the XML shape.
 
 ## Common mistakes
 
@@ -130,6 +131,7 @@ There is **no `<function-category>` element.** Function categories come from Jav
 | Forgetting to bump `<version>` | CDT changes don't take effect; upgrade may be ignored |
 | Putting business logic inside the smart service class | Untestable — SDK types cannot be instantiated in unit tests |
 | Reusing output fields across `run()` invocations | Stale values leak; instances are reused — reset every output at the top of `run()` |
+| Adding or removing a smart service parameter after first deploy | `IncompatibleSmartServiceRegistrationException` — Appian permanently pins parameter count to `<package>.<key>` at first deploy. A version bump does not lift this. Register a **new key** instead. |
 
 ## Verifying without a server
 

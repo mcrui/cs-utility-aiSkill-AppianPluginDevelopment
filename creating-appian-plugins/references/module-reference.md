@@ -27,22 +27,45 @@ If the file is missing or misplaced, Appian ignores the JAR entirely and reports
 | `<version>` | Two or three digits (`X.X` / `X.X.X`). **Must increase on every release.** Custom data type changes do not take effect without a bump. |
 | `<application-version min=>` | Minimum Appian version. Cannot be earlier than `18.4.0.0`. |
 
+## Function category
+
+```xml
+<function-category key="encryptionCategory" name="Encryption Functions">
+  <i18n-bundle>com.yourco.encryption.Resources</i18n-bundle>
+</function-category>
+```
+
+Declares a custom category that groups functions in the expression editor. The `key` is referenced
+by a `@Category("encryptionCategory")` annotation on the Java class. The `<i18n-bundle>` child
+resolves the display label from a properties file (e.g. `encryptionCategory_en_US.properties` with
+`encryptionCategory=Encryption Functions`).
+
+Categories can also come entirely from Java annotations — `@AppianScriptingFunctionsCategory` or a
+custom meta-annotation carrying `@Category("key")`. If you use the annotation-only approach, no
+`<function-category>` element is needed. Both mechanisms are valid; the descriptor element gives
+explicit i18n control.
+
 ## Expression function
 
 ```xml
-<function key="readBarCodeFromImage" class="com.yourco.barcode.utils.ReadBarCodeExpression"/>
+<function key="readBarCodeFromImage" class="com.yourco.barcode.utils.ReadBarCodeExpression">
+  <i18n-bundle>com.yourco.barcode.utils.Resources</i18n-bundle>
+</function>
 ```
 
-- Attributes are `key` and `class` only.
-- **There is no `<function-category>` element.** Categories are Java annotations —
-  `@AppianScriptingFunctionsCategory`, `@Category("...")`, or `@HiddenCategory`.
+- Attributes are `key` and `class`.
+- The optional `<i18n-bundle>` child names a resource bundle for the function's description and
+  parameter descriptions. When omitted, Appian looks for a bundle named after the function key
+  beside the class.
 - One class may export several `@Function` methods; register each with its own `<function>`.
 
 ## Smart service
 
 ```xml
 <smart-service name="Generate QR Code" key="GenerateQRCode"
-               class="com.yourco.barcode.utils.CreateQRCodeSmartService"/>
+               class="com.yourco.barcode.utils.CreateQRCodeSmartService">
+  <i18n-bundle>com.yourco.barcode.utils.Resources</i18n-bundle>
+</smart-service>
 ```
 
 Display name and icons come from resources beside the class, keyed by the **smart service key**:
@@ -53,6 +76,32 @@ com/yourco/barcode/utils/GenerateQRCode_en_US.properties    -> name=Generate QR 
 com/yourco/barcode/utils/GenerateQRCode/images/palette-icon.gif
 com/yourco/barcode/utils/GenerateQRCode/images/canvas-icon.gif
 ```
+
+The optional `<i18n-bundle>` child names a shared resource bundle for all smart services. When used,
+individual properties files are still keyed by the smart service key. If omitted, Appian looks for
+a bundle named after the key beside the class.
+
+### Smart service i18n keys
+
+Minimal bundles need only `name=`. Richer bundles can include input/output descriptions and error
+messages that are referenced from `SmartServiceException.Builder.userMessage()`:
+
+```properties
+name=Encrypt Document (RSA)
+description=Encrypts a document using hybrid RSA/AES envelope encryption.
+input.SourceDocument.displayName=Source Document
+input.SourceDocument.comment=The document to encrypt.
+input.TargetFolder.displayName=Target Folder
+input.TargetFolder.comment=Where the encrypted document will be created.
+output.NewDocument.displayName=New Document
+output.NewDocument.comment=The encrypted document.
+error.encryptionFailed=Encryption failed: {0}
+error.unsupportedFormat=Unsupported format ''{0}''. Supported: {1}.
+```
+
+Input/output keys use `input.<InputName>.displayName` and `output.<OutputName>.displayName`, where
+the name matches the `@Name` annotation value (or the JavaBean property name). Error keys are
+referenced by `SmartServiceException.Builder.userMessage("error.encryptionFailed", arg1, ...)`.
 
 ## Enumeration (dropdown of allowed input values)
 

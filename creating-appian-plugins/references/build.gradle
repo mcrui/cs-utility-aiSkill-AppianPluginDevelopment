@@ -281,3 +281,44 @@ tasks.register('verifyDescriptorClasses') {
 tasks.named('check') {
   dependsOn 'verifyBytecodeVersion', 'verifyPluginManifest', 'verifyDescriptorClasses'
 }
+
+// 4. Smart service i18n bundles — every <smart-service> key must have both
+//    .properties and _en_US.properties beside its class.
+//    Uncomment this task if your plug-in contains <smart-service> modules.
+//
+// tasks.register('verifySmartServiceBundles') {
+//   group = 'verification'
+//   description = 'Asserts every smart-service key has .properties and _en_US.properties beside its class.'
+//   def jarProvider = tasks.named('jar', Jar).flatMap { it.archiveFile }
+//   inputs.file(jarProvider)
+//   doLast {
+//     new java.util.zip.ZipFile(jarProvider.get().asFile).withCloseable { zip ->
+//       def xml = zip.getEntry('appian-plugin.xml')
+//       def text = zip.getInputStream(xml).withCloseable { it.text }
+//       def parsed = new groovy.xml.XmlSlurper().parseText(text)
+//       def violations = []
+//       parsed.'smart-service'.each { ss ->
+//         def key = ss.@key.toString()
+//         def cls = ss.@class.toString()
+//         def pkg = cls.contains('.') ? cls.substring(0, cls.lastIndexOf('.')).replace('.', '/') : ''
+//         [
+//           "${pkg}/${key}.properties".toString(),
+//           "${pkg}/${key}_en_US.properties".toString(),
+//         ].each { expected ->
+//           if (zip.getEntry(expected) == null) violations << "Missing: ${expected}"
+//         }
+//       }
+//       if (violations) {
+//         throw new GradleException(
+//           "Smart service i18n bundles missing:\n  " + violations.join('\n  '))
+//       }
+//       def count = parsed.'smart-service'.size()
+//       if (count == 0) {
+//         throw new GradleException('No <smart-service> elements found — verifier is a no-op.')
+//       }
+//       logger.lifecycle("verifySmartServiceBundles: OK - ${count} service(s), all bundles present")
+//     }
+//   }
+// }
+// If enabled, add to the check task:
+// tasks.named('check') { dependsOn 'verifySmartServiceBundles' }
