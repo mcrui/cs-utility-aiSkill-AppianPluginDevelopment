@@ -82,7 +82,8 @@ Key points:
 - `@PasswordDataType` marks a `String` as Encrypted Text (masked in the designer, cannot be bound to process variables — use plain `String` when the caller needs to read the value).
 - `@Input(enumeration = "img-format")` binds an input to an `<enumeration>` in the descriptor.
 - `@PaletteInfo` controls where the node appears in the process modeller palette.
-- `@Order({"SourceDocument", "TargetFolder", "PublicKey"})` controls the display order of inputs in the designer. Without it, order is undefined.
+- `@Order({"SourceDocument", "TargetFolder", "PublicKey"})` controls the display order of inputs in the designer. Without it, order is undefined. List **input parameters only** — output fields (getters) do not belong in `@Order`; reviewers reject it.
+- `validate(MessageContainer)` should reject inputs that are set but invalid, not only missing required ones. Optional id inputs (folder, document) must be checked when non-null, e.g. `if (destinationFolder != null && destinationFolder <= 0L) { messages.addError("DestinationFolder", "DestinationFolder must be a valid folder ID."); }`. Conditions that depend on runtime data (e.g. falling back to a source document's parent folder) cannot be checked here — guard them in `run()` and report them through the error outputs.
 - `@Unattended` marks a smart service as system-only (no attended task form).
 - Appian number inputs map to `Long`, not `Integer`.
 

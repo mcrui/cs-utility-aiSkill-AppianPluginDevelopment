@@ -130,6 +130,8 @@ Function categories can come from **either** a `<function-category>` element in 
 | Shipping the whole `runtimeClasspath` unfiltered | Compile-only annotation jars (`error_prone_annotations`) bundled |
 | Forgetting to bump `<version>` | CDT changes don't take effect; upgrade may be ignored |
 | Putting business logic inside the smart service class | Untestable — SDK types cannot be instantiated in unit tests |
+| Listing output fields in a smart service's `@Order` | Rejected in review — `@Order` is for input parameters only |
+| `validate()` checking only required inputs | Invalid optional ids (e.g. `DestinationFolder <= 0`) pass design-time validation and fail at runtime — check every non-null id input |
 | Reusing output fields across `run()` invocations | Stale values leak; instances are reused — reset every output at the top of `run()` |
 | Adding or removing a smart service parameter after first deploy | `IncompatibleSmartServiceRegistrationException` — Appian permanently pins parameter count to `<package>.<key>` at first deploy. A version bump does not lift this. Register a **new key** instead. |
 
@@ -170,3 +172,18 @@ It costs about a kilobyte and removes a coin flip. Both spellings agree that pro
 function.zipfilesize.description=Returns the compressed size in bytes.
 function.zipfilesize.param.documentId.description=The document to measure.
 ```
+
+## Step 5: Retro at the end of every plug-in build
+
+When a plug-in build finishes — and again after code review feedback comes back — run a short retro
+with the user before closing out:
+
+1. List what went wrong: build failures, deploy errors, wrong assumptions, review comments.
+2. For each one, ask: would this skill have prevented it if it had said so?
+3. If yes, add the lesson here — a row in **Common mistakes** or a note in the relevant
+   `references/` file — written as a general rule with a concrete example, not as a story about
+   this plug-in.
+4. Commit the skill change so the next build starts with the lesson.
+
+Skip lessons that are specific to one plug-in's business logic; keep the ones that would apply to
+the next plug-in too.
