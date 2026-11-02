@@ -133,6 +133,9 @@ Function categories can come from **either** a `<function-category>` element in 
 | Listing output fields in a smart service's `@Order` | Rejected in review — `@Order` is for input parameters only |
 | `validate()` checking only required inputs | Invalid optional ids (e.g. `DestinationFolder <= 0`) pass design-time validation and fail at runtime — check every non-null id input |
 | Reusing output fields across `run()` invocations | Stale values leak; instances are reused — reset every output at the top of `run()` |
+| Choosing the release version from git history alone | AppMarket rejects a version not higher than the one already published, and the repo may not record it (e.g. repo at 1.3.0, AppMarket at 1.3.1). Ask for or check the current AppMarket version first; a new feature is a minor bump above it |
+| Editing CRLF files (descriptor, `.gradle`, XML) with Git Bash `sed -i` on Windows | Line endings are silently rewritten to LF and `spotlessXmlCheck` fails the build. Use an editor/Edit tool that preserves endings, and check with `file <path>` |
+| Treating Spotless `Cannot add a configuration with name 'spotless-…'` as a code problem | It is a stale Gradle daemon. Run `./gradlew --stop`, then rebuild |
 | Adding or removing a smart service parameter after first deploy | `IncompatibleSmartServiceRegistrationException` — Appian permanently pins parameter count to `<package>.<key>` at first deploy. A version bump does not lift this. Register a **new key** instead. |
 
 ## Verifying without a server
